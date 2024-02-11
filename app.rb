@@ -11,20 +11,6 @@ class Logger
         @log_path = @os_path.split("/")[0..-2].join("/") + "/"
     end
 
-    #find the correct path for the log file
-    def find_log_path
-        @config_paths.each do |path|
-            if File.exist?(path)
-                return path
-            end
-        end
-        raise "Log file not found"
-    end
-
-    def inspect
-        @log_path
-    end
-
     def view_error_log
         if @os_path == "/var/log/httpd/error_log"
             open_log_file(@log_path + "error_log")
@@ -37,21 +23,39 @@ class Logger
         end
     end
 
+    def view_access_log
+        if @os_path == "/var/log/httpd/error_log"
+            open_log_file(@log_path + "access_log")
+        elsif @os_path == "/var/log/apache2/error.log"
+            open_log_file(@log_path + "access.log")
+        elsif @os_path == "/var/log/httpd-error.log"
+            open_log_file(@log_path + "httpd-access.log")
+        else
+            puts "Log file not found"
+        end
+    end
+
     def open_log_file(file_path)
         File.open(file_path, "r") do |file|
-            file.each_line do |line|
-                puts line
+            file.each_line.reverse_each do |line|                
+                #paint the line red if it contains 404
+                if line.include?("Sat Feb")
+                    puts "\e[31m#{line}\e[0m"
+                else
+                    puts line
+                end
             end
         end
     end
 
-
-    def view_access_log
-        File.open(@log_path + "access_log", "r") do |file|
-            file.each_line do |line|
-                puts line
+    #find the correct path for the log file
+    def find_log_path
+        @config_paths.each do |path|
+            if File.exist?(path)
+                return path
             end
         end
+        raise "Log file not found"
     end
 
     private :find_log_path
@@ -65,4 +69,5 @@ if __FILE__ == $0
     puts logger.inspect
 
     logger.view_error_log
+    #logger.view_access_log
 end

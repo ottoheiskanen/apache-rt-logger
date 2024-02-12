@@ -1,3 +1,5 @@
+require 'date'
+
 class Logger
     attr_accessor :log_path
 
@@ -66,8 +68,9 @@ end
 if __FILE__ == $0
     logger = Logger.new
     puts "------------"
-    puts logger.inspect
-
     logger.view_error_log
+    #logger.view_access_log
+
+    puts Date.today.strftime('%a %b %d %Y') #the order might be different if OS language is not english
     #logger.view_access_log
 end

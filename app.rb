@@ -40,9 +40,12 @@ class Logger
     def open_log_file(file_path)
         File.open(file_path, "r") do |file|
             file.each_line.reverse_each do |line|                
-                #paint the line red if it contains 404
-                if line.include?("Sat Feb")
-                    puts "\e[31m#{line}\e[0m"
+                
+                
+                #add search terms here
+                if line.include?("25")
+                    color_line(31, line)
+                    reset_color
                 else
                     puts line
                 end
@@ -60,8 +63,26 @@ class Logger
         raise "Log file not found"
     end
 
+    # Color codes:
+    # 30m - black
+    # 31m - red
+    # 32m - green
+    # 33m - yellow
+    # 34m - blue
+    # 35m - magenta
+    def color_line(color_code, text)
+        puts "\e[#{color_code}m#{text}"
+        reset_color
+    end
+
+    def reset_color
+        print "\e[0m"
+    end
+
     private :find_log_path
     private :open_log_file
+    private :reset_color
+    private :color_line
 end
 
 
@@ -72,5 +93,4 @@ if __FILE__ == $0
     #logger.view_access_log
 
     puts Date.today.strftime('%a %b %d %Y') #the order might be different if OS language is not english
-    #logger.view_access_log
 end
